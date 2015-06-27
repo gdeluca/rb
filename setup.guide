@@ -1,0 +1,29 @@
+sudo su
+
+apt-get install apache2 libapache2-mod-python python-mysqldb memcached  python-memcache patch git subversion mercurial python-svn python-setuptools  libapache2-mod-wsgi mysql-server
+a2enmod python
+
+mysql -u root -proot -e "create database reviewboard;"
+mysql -u root -proot -e "create user 'rb'@'localhost' identified by 'rb';"
+mysql -u root -proot -e "grant all on reviewboard.* to 'rb'@'localhost';"
+
+easy_install -f http://downloads.reviewboard.org/releases/ReviewBoard/2.5/ -U reviewboard
+
+rb-site install /var/www/reviewboard --domain-name=localhost --site-root=/ --media-url=media/ --db-type=mysql --db-name=reviewboard --db-user=root --db-pass=root --cache-type=memcached --cache-info=localhost:11211 --web-server-type=apache --python-loader=wsgi --admin-user=admin --admin-password=admin --admin-email=rb_admin@harriague.com
+
+chown -R www-data /var/www/reviewboard/htdocs/media/uploaded
+chown -R www-data /var/www/reviewboard/data
+chown -R www-data /var/www/reviewboard/htdocs/media/ext
+chown -R www-data /var/www/reviewboard/htdocs/static/ext
+
+cp /var/www/reviewboard/conf/apache-wsgi.conf /etc/apache2/sites-available/reviewboard.conf
+a2dissite default
+a2ensite reviewboard
+/etc/init.d/apache2 restart
+go to http://localhost:80
+
+-- en linux el cliente 
+easy_install RBTools
+
+en windows
+-- http://gnuwin32.sourceforge.net/packages/diffutils.htm
